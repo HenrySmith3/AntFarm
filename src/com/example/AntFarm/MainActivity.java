@@ -379,11 +379,14 @@ public class MainActivity extends BaseGameActivity implements Scene.IOnSceneTouc
                 && pEvent.getAction() == KeyEvent.ACTION_DOWN) {
             if (mEngine.isRunning() && backgroundMusic.isPlaying()) {
                 pauseMusic();
+                pauseFlag = true;
                 pauseGame();
                 Toast.makeText(this, "Menu button to resume",
                         Toast.LENGTH_SHORT).show();
             } else {
                 if (!backgroundMusic.isPlaying()) {
+                    unPauseGame();
+                    pauseFlag = false;
                     resumeMusic();
                     mEngine.start();
                 }
@@ -461,6 +464,35 @@ public class MainActivity extends BaseGameActivity implements Scene.IOnSceneTouc
             mMainScene.setChildScene(mResultScene, false, true, true);
             mEngine.stop();
         }
+    }
+
+    @Override
+    public void onResumeGame() {
+        super.onResumeGame();
+        if (runningFlag) {
+            if (pauseFlag) {
+                pauseFlag = false;
+                Toast.makeText(this, "Menu button to resume",
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                resumeMusic();
+                mEngine.stop();
+            }
+        } else {
+            runningFlag = true;
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        if (runningFlag) {
+            pauseMusic();
+            if (mEngine.isRunning()) {
+                pauseGame();
+                pauseFlag = true;
+            }
+        }
+        super.onPause();
     }
 
 }
